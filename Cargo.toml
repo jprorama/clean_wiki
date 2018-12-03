@@ -1,0 +1,9 @@
+[package]
+name = "clean_wiki"
+version = "0.1.0"
+authors = ["Stone Tickle <lattis@mochiro.moe>"]
+
+[dependencies]
+parse_wiki_text = "0.1.2"
+parse_mediawiki_dump = "0.1.0"
+bzip2 = "*"
