@@ -2,6 +2,12 @@ extern crate parse_wiki_text as pwt;
 extern crate parse_mediawiki_dump as pmd;
 extern crate bzip2;
 
+use std::io::Read;
+use pmd::Page;
+use pwt::{Configuration, Node};
+
+const CHARACTER_SAMPLE: usize = 1000;
+
 fn main() {
     let mut args = std::env::args();
     if args.len() != 2 {
@@ -9,7 +15,7 @@ fn main() {
         std::process::exit(1);
     }
     let path = args.nth(1).unwrap();
-    let file = match std::fs::File::open(&path) {
+    let mut file = match std::fs::File::open(&path) {
         Err(error) => {
             eprintln!("Failed to open input file: {}", error);
             std::process::exit(1);
@@ -22,6 +28,35 @@ fn main() {
         )));
     } else {
         parse(file);
+    }
+    //
+    //let mut buf = String::new();
+    //file.read_to_string(&mut buf).unwrap();
+    //println!("{}", clean_text(&buf));
+}
+
+fn clean_page(page: &Page) -> String {
+    clean_text(&page.text)
+}
+
+fn clean_text(string: &String) -> String {
+    let mut s = String::new();
+
+    for node in Configuration::default().parse(&string).nodes {
+        s += &fold_text_nodes(&node);
+    }
+
+    s[0..CHARACTER_SAMPLE].to_string()
+}
+
+fn fold_text_nodes(node: &Node) -> String {
+    match node {
+        Node::Text { value, .. } => {
+            //println!("textnode {:?}\n\n", node);
+            value.to_string()
+        },
+        _ => { //println!("skipping {:?}", node);
+               "".to_string() }
     }
 }
 
@@ -39,7 +74,8 @@ fn parse(source: impl std::io::BufRead) {
                 std::process::exit(1);
             }
             Ok(page) => {
-                println!("{:#?}", page);
+                println!("{}", clean_page(&page));
+                //println!("{:#?}", page);
             }
         }
     }
