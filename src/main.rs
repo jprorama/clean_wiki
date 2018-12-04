@@ -46,7 +46,11 @@ fn clean_text(string: &String) -> String {
         s += &fold_text_nodes(&node);
     }
 
-    s[0..CHARACTER_SAMPLE].to_string()
+    if s.len() > CHARACTER_SAMPLE {
+        s[0..CHARACTER_SAMPLE].to_string()
+    } else {
+	s[0..s.len()].to_string()
+    }
 }
 
 fn fold_text_nodes(node: &Node) -> String {
